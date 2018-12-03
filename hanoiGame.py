@@ -1,6 +1,7 @@
 import pygame as pg
 import sys
 import random
+from time import sleep
 
 # por Daniel Rodrigues
 
@@ -14,7 +15,7 @@ screen = pg.display.set_mode(size)
 pg.display.set_caption('Torre de Hanoi')
 screen.fill((0, 0, 0))
 fonte = pg.font.SysFont('Times New Roman', 50)
-text = fonte.render('Digite um número de discos de 1 a 6', True, (122, 122, 255))
+text = fonte.render('Digite um número de peças de 1 a 7', True, (122, 122, 255))
 screen.blit(text, ((size[0]//2) - (text.get_rect().width//2), (size[1]//2) - (text.get_rect().height//2)))
 pg.display.flip()
 
@@ -26,7 +27,7 @@ while not escolhido:
             pg.quit()
             sys.exit()
         if event.type == pg.KEYDOWN:
-            if event.key in range(49, 55):
+            if event.key in range(49, 56):
                 numDiscos = event.key - 48
                 escolhido = True
 
@@ -101,9 +102,8 @@ def printDiscos(posicoesDiscos):
     # Printa os discos nas posições desejadas.
     
     global numDiscos
-    
     for i in range(numDiscos):
-        tamDisco = (size[0]//8) - (10*i)
+        tamDisco = (size[0]//8) - (8*i)
         if posicoesDiscos[i] == -1:
             xDisco = (size[0]//2) - (tamDisco//2)
             yDisco = (size[1]//2) - 7
@@ -141,11 +141,26 @@ def buscarOpcaoClicada(jogar, assistir):
             return 2
 
         
-def ganhou():
-    # Printa um parabéns.
+def ganhou(movimentos):
+    # Printa as mensagens de fim de jogo.
     text = fonte.render('Parabéns! :)', True, ganhar)
-    screen.blit(text, (size[0]//2-(text.get_rect().width//2),size[1]//2-(text.get_rect().height//2)))
+    screen.blit(text, (size[0]//2-(text.get_rect().width//2), size[1]//2-(text.get_rect().height//2)))
     pg.display.update()
+    
+    if movimentos == movimentosHanoi(numDiscos):
+        # Se o jogo foi resolvido com o número mínimo de movimentos, printa um "perfeito".
+        string = "P E R F E I T O !"
+        tmp = fonte.render(string, True, ceu) # Variável penas para pegar o tamanho da string na fonte
+        posX = (size[0]//2) - (tmp.get_rect().width//2)
+        string = string.split()
+        for i in range(len(string)):
+            pg.event.pump()
+            pg.time.wait(250)
+            text = fonte.render(string[i] + ' ', True, (random.randrange(0, 255), random.randrange(0, 255), random.randrange(0, 180)))
+            screen.blit(text, (posX, 2*(size[1]//3)))
+            posX += text.get_rect().width
+            pg.display.update()
+            
     return False
 
 def hanoi(discos, origem, destino, aux):
@@ -162,6 +177,12 @@ def hanoi(discos, origem, destino, aux):
         
         yield from hanoi(discos-1, aux, destino, origem)
 
+def movimentosHanoi(n):
+    # Retorna o mínimo número de movimentos necessário para um jogo com n discos
+    if n == 1:
+        return 1
+    else:
+        return (2*movimentosHanoi(n-1))+1
 
 # Loop do menu
 printFundo()
@@ -212,7 +233,7 @@ if modo == 1:
                 printDiscos(posicoesDiscos)
                 printMovimentos(numMovimentos)
                 if 0 not in posicoesDiscos and 1 not in posicoesDiscos and -1 not in posicoesDiscos:
-                    jogando = ganhou()
+                    jogando = ganhou(numMovimentos)
 
 else:
     # Loop da demonstração
