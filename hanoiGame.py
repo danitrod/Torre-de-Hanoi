@@ -14,7 +14,7 @@ size = [600, 600]
 screen = pg.display.set_mode(size)
 pg.display.set_caption('Torre de Hanoi')
 screen.fill((0, 0, 0))
-fonte = pg.font.SysFont('Times New Roman', 50)
+fonte = pg.font.SysFont('Times New Roman', 30)
 text = fonte.render('Digite um número de peças de 1 a 7', True, (122, 122, 255))
 screen.blit(text, ((size[0]//2) - (text.get_rect().width//2), (size[1]//2) - (text.get_rect().height//2)))
 pg.display.flip()
